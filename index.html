@@ -1,0 +1,134 @@
+<html>
+<head>
+<style>
+#appName{
+	width:100%;
+	text-align:center;
+}
+
+.gameStartHeader{
+	font-size:20px;
+	font-weight:bolder;
+	text-align:center;
+	margin-top:2rem;
+}
+
+.mainGame{
+	margin-top:5rem;
+}
+
+</style>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+
+<body style="background-color:#151010;color:white;">
+<nav class="navbar" style="background-color:#4C4949;color:white;">
+	<h2 id="appName">Word Beater</h2>
+</nav>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-sm-12 gameStartHeader">
+			Type the Below Word/Paragraph
+		</div>
+	</div>
+  <div class="row mainGame">
+	<div class="col-sm-3">
+    </div>
+    <div class="col-sm-6 text-center">
+      <label for="exampleInputEmail1"><h5 id="inputLabel"></h5></label>
+	  <textarea class="form-control" id="inputText" onKeyUp="matchFunction()"></textarea>
+    </div>
+  </div>
+  <div class="row score-timeleft">
+	<div class="col-sm-3">
+    </div>
+	<div class="col-sm-1">
+		Time Left:
+    </div>
+	<div class="col-sm-1" id="seconds">
+	60
+    </div>
+	<div class="col-sm-2">
+    </div>
+	<div class="col-sm-3" id="scoreLabel">
+		Score:
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<script>
+let textLabel = document.getElementById("inputLabel");
+let textInput = document.getElementById("inputText");
+let scoreDisplay = document.getElementById('scoreLabel');
+let inputCharArray = "";
+scoreArrayInput = "";
+scoreArrayLabel = "";
+let inputArray = [];
+let labelArray = [];
+scoreCount =0;
+
+document.getElementById("inputLabel").innerHTML = "Challenge";
+
+function stringGenerator(){
+fetch('https://ghibliapi.herokuapp.com/films')
+	.then(response => response.json())
+  .then(commits => inputCharArray = commits[Math.floor(Math.floor(Math.random() * 18))].description);
+  return inputCharArray;
+}
+
+stringGenerator();
+timerStart=60;
+
+function countDown(){
+	let temp = setInterval(function(){ 
+			if(document.getElementById("seconds").innerHTML.trim() === "50"){
+			let inputTextLength = textInput.value;
+			let stringToAppend= '';
+			console.log('1',stringToAppend)
+				scoreArrayInput+= " " + textInput.value;
+				scoreArrayLabel+= " " + textLabel.innerHTML;
+
+				document.getElementById("inputText").disabled = true;
+				clearInterval(temp);
+				inputArray = scoreArrayInput.split(" ");
+				labelArray = scoreArrayLabel.split(" ");
+				for(let i=0; i<inputArray.length; i++){
+					if(inputArray[i] === labelArray[i]){
+						scoreCount+=1;
+						//console.log(inputArray[i])
+						//console.log(labelArray[i])
+						//console.log(inputArray[i] === labelArray[i])
+						//console.log(scoreCount)
+					}
+				}
+				scoreDisplay.innerHTML = "Score: "+(scoreCount-1)+"/wpm";
+			}
+			document.getElementById("seconds").innerHTML = timerStart--; 
+		}, 1000);
+}
+
+
+i=0;
+function matchFunction(){
+	if(textLabel.innerHTML === textInput.value){
+		let displayText = stringGenerator();
+		scoreArrayInput+= " " + textInput.value;
+		scoreArrayLabel+= " " + textLabel.innerHTML;
+		document.getElementById("inputLabel").innerHTML = displayText;
+		document.getElementById("inputText").value = "";
+			}
+	if(i===0){
+		i++;
+		countDown();
+	}
+}
+
+
+
+</script>
+</body>
+</html>
